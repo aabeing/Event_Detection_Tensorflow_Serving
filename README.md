@@ -1,4 +1,4 @@
 # Event_Detection_Tensorflow_Serving
 Acoustic event detection using yamnet (Pre-trained classifer on 521 sound classes).  A flask app is created for the model and dockerized using docker container image tensorflow serving. The output graph for top_n classes is scaled on milliseconds time. Based on the output obtained any classes can be chosen and if it belongs to a top probability class then the video/audio is clipped and output file is stored. The input audio/video can be either uploaded directly from the system (Takes very less processing time) or downloaded from a link provided as input text. Youtube_dl python is used for downloading from the net. The yamnet reads input as waveforms obtained from wav files and runs the prediction much faster than the actual duration of audio. 
 
-app_test.py: Dockerized implementation of flask api
+app_test.py: Dockerized implementation(model_test.py) of flask api
