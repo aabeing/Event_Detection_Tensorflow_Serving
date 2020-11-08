@@ -13,42 +13,44 @@ import math
 MODEL_URI='http://localhost:8501/v1/models/yamnet:predict'
 
 
-# def segment_find(out_sec_single):
-#     PROB_THRESH_CONST = 0.4
-#     # ind2 = np.argsort(out_sec[:,CLASS_INDEX])[::-1]
-#     print("LOG: SEG: ")
-#     print(out_sec_single.shape)
-#     ind = np.arange(start = 1, stop = out_sec_single.shape[0])
-#     # print(ind.shape)
-#     s_time = min(ind,key = lambda x: x if out_sec_single[x] > PROB_THRESH_CONST else 9999)
-#     e_time = max(ind,key = lambda x: x if out_sec_single[x] > PROB_THRESH_CONST else -1)
-#     #converting into seconds
-#     print("Millisecs")
-#     print(s_time,e_time)
-#     print(out_sec_single[s_time])
-#     print("LOG: TESTING: false check")
-#     print(out_sec_single[s_time] > PROB_THRESH_CONST)
-#     s_time = math.floor(s_time/1000)
-#     e_time = math.ceil(e_time/1000)
-#     return [s_time,e_time]
 def segment_find(out_sec_single):
     PROB_THRESH_CONST = 0.45
-    #s_t = duration + 1
-    s_t = 9999 
-    e_t = 0
-    for i in range(out_sec_single.shape[0]):
-        if out_sec_single[i] > PROB_THRESH_CONST:
-            if s_t > i:
-                s_t = i
-            if e_t < i:
-                e_t = i
+    # ind2 = np.argsort(out_sec[:,CLASS_INDEX])[::-1]
+    print("LOG: SEG: ")
+    print(out_sec_single.shape)
+    ind = np.arange(start = 1, stop = out_sec_single.shape[0])
+    # print(ind.shape)
+    s_time = min(ind,key = lambda x: x if out_sec_single[x] > PROB_THRESH_CONST else 99999999)
+    e_time = max(ind,key = lambda x: x if out_sec_single[x] > PROB_THRESH_CONST else -1)
+    #converting into seconds
     print("Millisecs")
-    print(s_t,e_t)  
-    print(out_sec_single[s_t])   
-    #floor used to get a second earlier before the class detected  
-    s_t = math.floor(s_t/1000)
-    e_t = math.ceil(e_t/1000)
-    return [s_t,e_t]
+    print(s_time,e_time)
+    print(out_sec_single[s_time])
+    print("LOG: TESTING: false check")
+    print(out_sec_single[s_time] > PROB_THRESH_CONST)
+    s_time = math.floor(s_time/1000)
+    e_time = math.ceil(e_time/1000)
+    return [s_time,e_time]
+# def segment_find(out_sec_single):
+#     PROB_THRESH_CONST = 0.45
+#     #s_t = duration + 1
+#     s_t = 99999999 
+#     e_t = 0
+#     for i in range(out_sec_single.shape[0]):
+#         if out_sec_single[i] > PROB_THRESH_CONST:
+#             if s_t > i:
+#                 print("Start update:",i)
+#                 s_t = i
+#             if e_t < i:
+#                 # print("End update:",i)
+#                 e_t = i
+#     print("Millisecs")
+#     print(s_t,e_t)  
+#     print(out_sec_single[s_t])   
+#     #floor used to get a second earlier before the class detected  
+#     s_t = math.floor(s_t/1000)
+#     e_t = math.ceil(e_t/1000)
+#     return [s_t,e_t]
         
 
 def get_prediction(av_filename,image_path):
@@ -106,9 +108,11 @@ def get_prediction(av_filename,image_path):
     response = requests.post(MODEL_URI,data)
     out = response.json()
 
-    out_numpy = np.array(out['outputs']['activation_2'])
-
-    # print(out['error'])
+    try:
+        out_numpy = np.array(out['outputs']['activation_2'])
+    except:
+        print("Error Exception caught....  \n" + out['error'])
+        exit()
     print("LOG: output Shape")
     print(out_numpy.shape)
 
@@ -158,7 +162,9 @@ def get_prediction(av_filename,image_path):
             clip.write_audiofile(filename = "static/out_audio_clipped.wav")
             clip.close()
 
-    out = class_names[top_class_indices[0]] + ' ' + class_names[top_class_indices[1]] + ' and clipped ' + str(li[0]) + ' to ' + str(li[1]) + 'seconds'
+        out = class_names[top_class_indices[0]] + ' ' + class_names[top_class_indices[1]] + ' and clipped ' + str(li[0]) + ' to ' + str(li[1]) + 'seconds'
+    else:
+        out = class_names[top_class_indices[0]] + ' ' + class_names[top_class_indices[1]]
     return out
 
 
