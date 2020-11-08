@@ -13,15 +13,15 @@ import math
 MODEL_URI='http://localhost:8501/v1/models/yamnet:predict'
 
 
-def segment_find(out_sec_single):
+def segment_find(out_sec_single,duration):
     PROB_THRESH_CONST = 0.45
     # ind2 = np.argsort(out_sec[:,CLASS_INDEX])[::-1]
     print("LOG: SEG: ")
     print(out_sec_single.shape)
     ind = np.arange(start = 1, stop = out_sec_single.shape[0])
     # print(ind.shape)
-    s_time = min(ind,key = lambda x: x if out_sec_single[x] > PROB_THRESH_CONST else 99999999)
-    e_time = max(ind,key = lambda x: x if out_sec_single[x] > PROB_THRESH_CONST else -1)
+    s_time = min(ind,key = lambda x: x if out_sec_single[x] > PROB_THRESH_CONST else duration)
+    e_time = max(ind,key = lambda x: x if out_sec_single[x] > PROB_THRESH_CONST else 0)
     #converting into seconds
     print("Millisecs")
     print(s_time,e_time)
@@ -67,6 +67,7 @@ def get_prediction(av_filename,image_path):
     print(waveform.shape)
     #Find duration
     duration = len(wav_data)/sr
+    print("LOG Duration: ")
     print(duration)
     #Correction for multi channel audio
     if(waveform.ndim != 1):
@@ -98,11 +99,11 @@ def get_prediction(av_filename,image_path):
     print(out_numpy.shape)
 
     #Converting into milliseconds 
-    duration = int(duration)
-    out_sec = np.zeros(shape=(duration * 1000,out_numpy.shape[1]))
+    duration = duration * 1000
+    out_sec = np.zeros(shape=(int(duration),out_numpy.shape[1]))
     # out_sec = np.zeros(shape=(duration,out_numpy.shape[1]))
     for i in range(0,out_sec.shape[0]):
-        index = ((i)/out_sec.shape[0]) * out_numpy.shape[0]
+        index = (i/out_sec.shape[0]) * out_numpy.shape[0]
         index = int(index)
         # print(index,i)
         out_sec[i] = out_numpy[index]
@@ -130,7 +131,7 @@ def get_prediction(av_filename,image_path):
     # Siren : 390
     CLASS_INDEX = 420
     if CLASS_INDEX in top_class_indices:
-        li = segment_find( out_sec[:,CLASS_INDEX] ) 
+        li = segment_find( out_sec[:,CLASS_INDEX], duration) 
         print("LOG:#### (s_time,e_time)")
         print(li)
         #Cropping and writing onto a file 
