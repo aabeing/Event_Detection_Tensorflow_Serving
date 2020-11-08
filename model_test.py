@@ -31,26 +31,7 @@ def segment_find(out_sec_single):
     s_time = math.floor(s_time/1000)
     e_time = math.ceil(e_time/1000)
     return [s_time,e_time]
-# def segment_find(out_sec_single):
-#     PROB_THRESH_CONST = 0.45
-#     #s_t = duration + 1
-#     s_t = 99999999 
-#     e_t = 0
-#     for i in range(out_sec_single.shape[0]):
-#         if out_sec_single[i] > PROB_THRESH_CONST:
-#             if s_t > i:
-#                 print("Start update:",i)
-#                 s_t = i
-#             if e_t < i:
-#                 # print("End update:",i)
-#                 e_t = i
-#     print("Millisecs")
-#     print(s_t,e_t)  
-#     print(out_sec_single[s_t])   
-#     #floor used to get a second earlier before the class detected  
-#     s_t = math.floor(s_t/1000)
-#     e_t = math.ceil(e_t/1000)
-#     return [s_t,e_t]
+
         
 
 def get_prediction(av_filename,image_path):
