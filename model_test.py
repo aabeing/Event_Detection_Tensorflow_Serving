@@ -13,14 +13,14 @@ import math
 MODEL_URI='http://localhost:8501/v1/models/yamnet:predict'
 
 
-def segment_find(out_sec_single,duration):
+def segment_find(out_sec_single):
     PROB_THRESH_CONST = 0.45
     # ind2 = np.argsort(out_sec[:,CLASS_INDEX])[::-1]
     print("LOG: SEG: ")
     print(out_sec_single.shape)
     ind = np.arange(start = 1, stop = out_sec_single.shape[0])
     # print(ind.shape)
-    s_time = min(ind,key = lambda x: x if out_sec_single[x] > PROB_THRESH_CONST else duration)
+    s_time = min(ind,key = lambda x: x if out_sec_single[x] > PROB_THRESH_CONST else out_sec_single.shape[0])
     e_time = max(ind,key = lambda x: x if out_sec_single[x] > PROB_THRESH_CONST else 0)
     #converting into seconds
     print("Millisecs")
@@ -131,7 +131,7 @@ def get_prediction(av_filename,image_path):
     # Siren : 390
     CLASS_INDEX = 420
     if CLASS_INDEX in top_class_indices:
-        li = segment_find( out_sec[:,CLASS_INDEX], duration) 
+        li = segment_find( out_sec[:,CLASS_INDEX]) 
         print("LOG:#### (s_time,e_time)")
         print(li)
         #Cropping and writing onto a file 
